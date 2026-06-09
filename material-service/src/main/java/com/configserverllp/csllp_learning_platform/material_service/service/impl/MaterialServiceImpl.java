@@ -10,6 +10,10 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -72,6 +76,22 @@ public class MaterialServiceImpl implements MaterialService {
 
         // Call User Service to validate uploader
         @SuppressWarnings("unchecked")
+//        HttpHeaders headers = new HttpHeaders();
+//
+//        headers.setBearerAuth(token);
+//
+//        HttpEntity<?> entity =
+//                new HttpEntity<>(headers);
+//
+//        ResponseEntity<Map> response =
+//                restTemplate.exchange(
+//                        userServiceBaseUrl +
+//                                "/api/users/" +
+//                                request.getUploadedBy(),
+//                        HttpMethod.GET,
+//                        entity,
+//                        Map.class
+//                );
         Map<String,Object> apiResp = restTemplate.getForObject(userServiceBaseUrl + "/api/users/" + request.getUploadedBy(), Map.class);
 
         if (apiResp == null || apiResp.get("data") == null) {

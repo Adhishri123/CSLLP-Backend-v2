@@ -2,7 +2,6 @@ package com.configserverllp.csllp_learning_platform.user_service.config;
 
 import com.configserverllp.csllp_learning_platform.user_service.service.impl.CustomUserDetail;
 import com.configserverllp.csllp_learning_platform.user_service.service.impl.JWTService;
-import com.configserverllp.csllp_learning_platform.user_service.service.impl.UserServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,5 +74,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-    
+
 }
