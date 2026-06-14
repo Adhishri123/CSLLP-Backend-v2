@@ -1,6 +1,7 @@
 package com.configserverllp.csllp_learning_platform.user_service.controller;
 
 import com.configserverllp.csllp_learning_platform.user_service.dto.*;
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import com.configserverllp.csllp_learning_platform.user_service.entity.User;
 import com.configserverllp.csllp_learning_platform.user_service.service.UserService;
 import com.configserverllp.csllp_learning_platform.user_service.service.impl.JWTService;
@@ -45,7 +46,8 @@ public class AuthController {
         // Get UserResponse (profile + dashboard)
         UserResponse profile = userService.getProfile(u.getId());
 
-        if ("ADMIN".equalsIgnoreCase(u.getRole()) || "MANAGER".equalsIgnoreCase(u.getRole())) {
+//        if ("ADMIN".equalsIgnoreCase(u.getRole()) || "MANAGER".equalsIgnoreCase(u.getRole())) {
+        if (u.getRole() == Role.ADMIN ||  u.getRole() == Role.MANAGER) {
             profile.setTotalEmployees(userService.getTotalEmployees());
             profile.setTotalCourses(userService.getTotalCourses());
             profile.setCompletedCourses(userService.getCompletedCourses());

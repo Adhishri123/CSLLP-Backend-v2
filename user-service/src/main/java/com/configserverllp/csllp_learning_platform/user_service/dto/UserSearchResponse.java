@@ -1,5 +1,6 @@
 package com.configserverllp.csllp_learning_platform.user_service.dto;
 
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,8 @@ public class UserSearchResponse {
     private String employeeId;
     private String name;
     private String email;
-    private String role;
+//    private String role;
+    private Role role;
     private String department;
     private String status;
 }

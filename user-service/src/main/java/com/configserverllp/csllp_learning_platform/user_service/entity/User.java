@@ -26,8 +26,15 @@ public class User {
 
     private String lastName;
 
-    @Column(nullable = false)
-    private String role;
+//    @Column(nullable = false)
+//    private String fullName;
+
+//    @Column(nullable = false)
+//    private String role;
+
+    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+    private Role role;
 
     private Long managerId; // reporting manager id (nullable)
 

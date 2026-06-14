@@ -1,6 +1,7 @@
 package com.configserverllp.csllp_learning_platform.user_service.controller;
 
 import com.configserverllp.csllp_learning_platform.user_service.dto.*;
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import com.configserverllp.csllp_learning_platform.user_service.entity.User;
 import com.configserverllp.csllp_learning_platform.user_service.service.UserService;
 import com.configserverllp.csllp_learning_platform.user_service.util.ApiResponse;
@@ -103,7 +104,8 @@ public class UserController {
         UserResponse dashboard = userService.getProfile(id);
 
         // If admin or manager, fill dashboard metrics
-        if ("ADMIN".equalsIgnoreCase(dashboard.getRole()) || "MANAGER".equalsIgnoreCase(dashboard.getRole())) {
+//        if ("ADMIN".equalsIgnoreCase(dashboard.getRole()) || "MANAGER".equalsIgnoreCase(dashboard.getRole())) {
+        if (dashboard.getRole() == Role.ADMIN || dashboard.getRole() == Role.MANAGER) {
             dashboard.setTotalEmployees(userService.getTotalEmployees());
             dashboard.setTotalCourses(userService.getTotalCourses());
             dashboard.setCompletedCourses(userService.getCompletedCourses());
@@ -134,7 +136,8 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<UserResponse>>> getManagerTeam(@PathVariable Long managerId) {
         List<User> teamMembers = userService.getUsersByManagerId(managerId);
         List<UserResponse> resp = teamMembers.stream()
-                .filter(user -> "EMPLOYEE".equals(user.getRole())) // Only return EMPLOYEES, not other managers
+//                .filter(user -> "EMPLOYEE".equals(user.getRole())) // Only return EMPLOYEES, not other managers
+                .filter(user ->  user.getRole() == Role.EMPLOYEE) // Only return EMPLOYEES, not other managers
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new ApiResponse<>(true, "Manager team fetched", resp));

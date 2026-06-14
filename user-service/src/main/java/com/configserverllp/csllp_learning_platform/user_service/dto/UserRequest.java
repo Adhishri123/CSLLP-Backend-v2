@@ -2,8 +2,10 @@ package com.configserverllp.csllp_learning_platform.user_service.dto;
 
 
 
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,8 +20,13 @@ public class UserRequest {
 
     private String lastName;
 
-    @NotBlank(message = "Role is required")
-    private String role; // ADMIN, MANAGER, EMPLOYEE, HR
+//    @NotBlank(message = "Full name is required")
+//    private String fullName;
+
+//    @NotBlank(message = "Role is required")
+//    private String role; // ADMIN, MANAGER, EMPLOYEE, HR
+    @NotNull(message = "Role is required")
+    private Role role; // ADMIN, MANAGER, EMPLOYEE, HR
 
     // optional: for admin-created employee
     private Long managerId;

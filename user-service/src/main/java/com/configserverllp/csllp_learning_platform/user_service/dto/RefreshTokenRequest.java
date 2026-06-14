@@ -1,4 +1,7 @@
 package com.configserverllp.csllp_learning_platform.user_service.dto;
 
-public record RefreshTokenRequest(String refreshToken) {
+public record RefreshTokenRequest() {
 }
+
+//public record RefreshTokenRequest(String refreshToken) {
+//}

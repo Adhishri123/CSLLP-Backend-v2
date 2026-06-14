@@ -2,6 +2,7 @@ package com.configserverllp.csllp_learning_platform.user_service.service.impl;
 
 import com.configserverllp.csllp_learning_platform.user_service.dto.*;
 import com.configserverllp.csllp_learning_platform.user_service.entity.Otp;
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import com.configserverllp.csllp_learning_platform.user_service.entity.User;
 import com.configserverllp.csllp_learning_platform.user_service.exception.BadRequestException;
 import com.configserverllp.csllp_learning_platform.user_service.exception.ResourceNotFoundException;
@@ -50,12 +51,14 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(req.getManagerId()).ifPresent(mid -> {
             User m = userRepository.findById(mid)
                     .orElseThrow(() -> new BadRequestException("Manager not found"));
-            if (!"MANAGER".equalsIgnoreCase(m.getRole()))
+//            if (!"MANAGER".equalsIgnoreCase(m.getRole()))
+            if (m.getRole() != Role.MANAGER)
                 throw new BadRequestException("Selected manager is not a manager");
         });
 
         // Manager can only create employees
-        if ("MANAGER".equalsIgnoreCase(creatorRole) && !"EMPLOYEE".equalsIgnoreCase(req.getRole())) {
+//        if ("MANAGER".equalsIgnoreCase(creatorRole) && !"EMPLOYEE".equalsIgnoreCase(req.getRole())) {
+        if ("MANAGER".equalsIgnoreCase(creatorRole) && req.getRole() != Role.EMPLOYEE) {
             throw new BadRequestException("Manager can only create EMPLOYEE role");
         }
 
@@ -79,7 +82,8 @@ public class UserServiceImpl implements UserService {
         sendEmailViaNotificationService(saved.getEmail(), req.getPassword());
 
         // --- NEW: Assign mandatory courses for EMPLOYEE ---
-        if ("EMPLOYEE".equalsIgnoreCase(u.getRole())) {
+//        if ("EMPLOYEE".equalsIgnoreCase(u.getRole())) {
+        if (u.getRole() == Role.EMPLOYEE) {
             try {
                 List<Long> mandatoryCourseIds = restTemplate.getForObject(
                         "http://course-service/api/courses/mandatory", List.class);
@@ -159,7 +163,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsersByRole(String role) {
         if ("ALL".equalsIgnoreCase(role)) return userRepository.findAll();
-        return userRepository.findByRole(role);
+//        Role.valueOf(role.toUpperCase());
+        return userRepository.findByRole(Role.valueOf(role.toUpperCase()));
     }
 
     @Override
@@ -175,7 +180,8 @@ public class UserServiceImpl implements UserService {
         if (!"ACTIVE".equalsIgnoreCase(u.getStatus()))
             throw new BadRequestException("User not active");
 
-        if (!u.getRole().equalsIgnoreCase(req.getRole()))
+//        if (!u.getRole().equalsIgnoreCase(req.getRole()))
+        if (u.getRole() != req.getRole())
             throw new BadRequestException("User does not have role: " + req.getRole());
 
 //        if (!passwordEncoder.matches(req.getPassword(), u.getPassword())) {
@@ -228,7 +234,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int getTotalEmployees() {
-        return userRepository.findByRole("EMPLOYEE").size();
+//        return userRepository.findByRole("EMPLOYEE").size();
+        return userRepository.findByRole(Role.EMPLOYEE).size();
     }
 
     @Override
@@ -249,7 +256,8 @@ public class UserServiceImpl implements UserService {
         if ("ALL".equalsIgnoreCase(role)) {
             return userRepository.count();
         }
-        return userRepository.countByRole(role);
+//        return userRepository.countByRole(role);
+        return userRepository.countByRole(Role.valueOf(role.toUpperCase()));
     }
 
     // NEW METHOD IMPLEMENTATION - Search Users
@@ -384,7 +392,8 @@ public class UserServiceImpl implements UserService {
         List<User> users = searchUsers(query);
 
         return users.stream()
-                .filter(user -> role == null || user.getRole().equalsIgnoreCase(role))
+//                .filter(user -> role == null || user.getRole().equalsIgnoreCase(role))
+                .filter(user -> role == null || user.getRole() == Role.valueOf(role.toUpperCase()))
                 .map(user -> UserSearchResponse.builder()
                         .id(user.getId())
                         .employeeId("EMP" + user.getId()) // Generate employee ID

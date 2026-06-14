@@ -1,6 +1,7 @@
 package com.configserverllp.csllp_learning_platform.user_service.dto;
 
 
+import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
     private Long id;
     private String email;
-    private String role;
+//    private String role;
+    private Role role;
     private Long managerId;
 
     // New fields
