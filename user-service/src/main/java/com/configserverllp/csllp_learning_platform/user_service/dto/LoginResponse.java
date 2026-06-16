@@ -19,4 +19,8 @@ public class LoginResponse {
     // New fields
     private UserResponse profile;           // User profile details
     private UserResponse dashboard;
+
+     private String fullName;
+     private String token;
+     private String tokenType;
 }

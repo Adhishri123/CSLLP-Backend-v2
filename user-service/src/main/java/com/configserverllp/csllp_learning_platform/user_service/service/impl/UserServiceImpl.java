@@ -73,6 +73,11 @@ public class UserServiceImpl implements UserService {
         u.setCreatedAt(LocalDateTime.now());
         u.setUpdatedAt(LocalDateTime.now());
 
+        u.setDesignation(req.getDesignation());
+        u.setDepartment(req.getDepartment());
+        u.setAnnualSalary(req.getAnnualSalary());
+        u.setDateOfJoining(req.getDateOfJoining());
+
         // Set managerId for manager-created employee
         if ("MANAGER".equalsIgnoreCase(creatorRole)) u.setManagerId(creatorId);
         Optional.ofNullable(req.getManagerId()).ifPresent(u::setManagerId);

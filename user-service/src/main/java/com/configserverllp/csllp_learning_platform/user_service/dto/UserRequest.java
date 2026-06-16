@@ -9,8 +9,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class UserRequest {
+
+    private Long id;
+
     @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")
     private String email;
@@ -36,5 +41,21 @@ public class UserRequest {
     private String password;
 
     private String profilePhotoUrl; // NEW
+
+    private String phoneNumber;
+    private String address;
+    private String designation;
+    private String department;
+    private Double annualSalary;
+    @NotNull(message = "Date of Joining is required")
+    private LocalDate dateOfJoining;
+    private String panNumber;
+    private String pfNumber;
+    private String uanNumber;
+    private String bankName;
+    private String bankBranch;
+    private String bankAccountNumber;
+    private String vendorCode;
+
 }
 

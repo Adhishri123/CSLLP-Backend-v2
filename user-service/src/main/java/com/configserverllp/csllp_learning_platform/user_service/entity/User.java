@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -50,4 +51,19 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+  private String designation;
+  private String department;
+  private Double annualSalary;
+  private LocalDate dateOfJoining;
+  private String phoneNumber;
+  private String address;
+  private String panNumber;
+  private String pfNumber;
+  private String uanNumber;
+  private String bankName;
+  private String bankBranch;
+  private String bankAccountNumber;
+  private String vendorCode;
+
 }
