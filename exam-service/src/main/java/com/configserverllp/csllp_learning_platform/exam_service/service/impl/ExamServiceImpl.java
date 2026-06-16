@@ -54,6 +54,7 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("Only ADMIN or MANAGER can create exams");
         }
 
+
         Exam exam = Exam.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())

@@ -9,7 +9,7 @@ import lombok.Data;
 public class UserSearchResponse {
     private Long id;
     private String employeeId;
-    private String name;
+    private String fullName;
     private String email;
 //    private String role;
     private Role role;

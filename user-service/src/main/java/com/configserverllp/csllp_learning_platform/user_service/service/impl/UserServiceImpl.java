@@ -64,8 +64,9 @@ public class UserServiceImpl implements UserService {
 
         User u = new User();
         u.setEmail(req.getEmail());
-        u.setFirstName(req.getFirstName());
-        u.setLastName(req.getLastName());
+//        u.setFirstName(req.getFirstName());
+//        u.setLastName(req.getLastName());
+        u.setFullName(req.getFullName());
         u.setRole(req.getRole());
         u.setStatus("ACTIVE");
         u.setPassword(passwordEncoder.encode(req.getPassword()));
@@ -130,8 +131,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long id, UserRequest update) {
         User existing = getUserById(id);
-        existing.setFirstName(update.getFirstName());
-        existing.setLastName(update.getLastName());
+//        existing.setFirstName(update.getFirstName());
+//        existing.setLastName(update.getLastName());
+        existing.setFullName(update.getFullName());
         existing.setRole(update.getRole());
         existing.setManagerId(update.getManagerId());
         existing.setUpdatedAt(LocalDateTime.now());
@@ -205,8 +207,9 @@ public class UserServiceImpl implements UserService {
         return UserResponse.builder()
                 .id(u.getId())
                 .email(u.getEmail())
-                .firstName(u.getFirstName())
-                .lastName(u.getLastName())
+//                .firstName(u.getFirstName())
+//                .lastName(u.getLastName())
+                .fullName(u.getFullName())
                 .role(u.getRole())
                 .managerId(u.getManagerId())
                 .status(u.getStatus())
@@ -219,8 +222,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateProfile(Long userId, UserRequest updateReq) {
         User u = getUserById(userId);
-        if (updateReq.getFirstName() != null) u.setFirstName(updateReq.getFirstName());
-        if (updateReq.getLastName() != null) u.setLastName(updateReq.getLastName());
+//        if (updateReq.getFirstName() != null) u.setFirstName(updateReq.getFirstName());
+//        if (updateReq.getLastName() != null) u.setLastName(updateReq.getLastName());
+        if (updateReq.getFullName() != null) u.setFullName(updateReq.getFullName());
         if (updateReq.getPassword() != null && !updateReq.getPassword().isBlank()) {
             u.setPassword(passwordEncoder.encode(updateReq.getPassword()));
         }
@@ -397,7 +401,8 @@ public class UserServiceImpl implements UserService {
                 .map(user -> UserSearchResponse.builder()
                         .id(user.getId())
                         .employeeId("EMP" + user.getId()) // Generate employee ID
-                        .name(user.getFirstName() + " " + user.getLastName())
+//                        .name(user.getFirstName() + " " + user.getLastName())
+                        .fullName(user.getFullName())
                         .email(user.getEmail())
                         .role(user.getRole())
                         .department("") // Add if you have department field

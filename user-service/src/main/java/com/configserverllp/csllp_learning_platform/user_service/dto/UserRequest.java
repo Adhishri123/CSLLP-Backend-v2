@@ -15,13 +15,13 @@ public class UserRequest {
     @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank(message = "First name is required")
-    private String firstName;
+//    @NotBlank(message = "First name is required")
+//    private String firstName;
+//
+//    private String lastName;
 
-    private String lastName;
-
-//    @NotBlank(message = "Full name is required")
-//    private String fullName;
+    @NotBlank(message = "Full name is required")
+    private String fullName;
 
 //    @NotBlank(message = "Role is required")
 //    private String role; // ADMIN, MANAGER, EMPLOYEE, HR
