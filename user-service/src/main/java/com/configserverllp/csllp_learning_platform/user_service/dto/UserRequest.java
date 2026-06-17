@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Data
 public class UserRequest {
 
-    private Long id;
+    private Long userId;
 
     @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")

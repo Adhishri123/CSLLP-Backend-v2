@@ -171,6 +171,19 @@ public class UserController {
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
                 .profilePhotoUrl(u.getProfilePhotoUrl())
+                .designation(u.getDesignation())
+                .department(u.getDepartment())
+                .annualSalary(u.getAnnualSalary())
+                .dateOfJoining(u.getDateOfJoining())
+                .phoneNumber(u.getPhoneNumber())
+                .address(u.getAddress())
+                .panNumber(u.getPanNumber())
+                .pfNumber(u.getPfNumber())
+                .uanNumber(u.getUanNumber())
+                .bankName(u.getBankName())
+                .bankBranch(u.getBankBranch())
+                .bankAccountNumber(u.getBankAccountNumber())
+                .vendorCode(u.getVendorCode())
                 .build();
     }
 

@@ -135,6 +135,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, UserRequest update) {
+        System.out.println("Annual Salary = " + update.getAnnualSalary());
+        System.out.println("DOJ = " + update.getDateOfJoining());
         User existing = getUserById(id);
 //        existing.setFirstName(update.getFirstName());
 //        existing.setLastName(update.getLastName());
@@ -144,6 +146,24 @@ public class UserServiceImpl implements UserService {
         existing.setUpdatedAt(LocalDateTime.now());
         Optional.ofNullable(update.getPassword()).filter(p -> !p.trim().isEmpty())
                 .ifPresent(p -> existing.setPassword(passwordEncoder.encode(p)));
+
+        existing.setDesignation(update.getDesignation());
+        existing.setDepartment(update.getDepartment());
+        existing.setAnnualSalary(update.getAnnualSalary());
+//        existing.setStatus(update.getStatus());
+        existing.setDateOfJoining(update.getDateOfJoining());
+        existing.setPhoneNumber(update.getPhoneNumber());
+        existing.setAddress(update.getAddress());
+
+        // ✅ Added new fields
+        existing.setPanNumber(update.getPanNumber());
+        existing.setPfNumber(update.getPfNumber());
+        existing.setUanNumber(update.getUanNumber());
+        existing.setBankName(update.getBankName());
+        existing.setBankBranch(update.getBankBranch());
+        existing.setBankAccountNumber(update.getBankAccountNumber());
+        existing.setVendorCode(update.getVendorCode());
+
         return userRepository.save(existing);
     }
 
@@ -221,11 +241,16 @@ public class UserServiceImpl implements UserService {
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
                 .profilePhotoUrl(u.getProfilePhotoUrl()) // assuming added in User entity
+                .designation(u.getDesignation())
+                .department(u.getDepartment())
+                .address(u.getAddress())
+                .phoneNumber(u.getPhoneNumber())
                 .build();
     }
 
     @Override
     public UserResponse updateProfile(Long userId, UserRequest updateReq) {
+        System.out.println("Designation = " + updateReq.getDesignation());
         User u = getUserById(userId);
 //        if (updateReq.getFirstName() != null) u.setFirstName(updateReq.getFirstName());
 //        if (updateReq.getLastName() != null) u.setLastName(updateReq.getLastName());
@@ -236,6 +261,11 @@ public class UserServiceImpl implements UserService {
         if (updateReq.getProfilePhotoUrl() != null) {
             u.setProfilePhotoUrl(updateReq.getProfilePhotoUrl());
         }
+        if(updateReq.getPhoneNumber() != null) u.setPhoneNumber(updateReq.getPhoneNumber());
+        if(updateReq.getAddress() != null) u.setAddress(updateReq.getAddress());
+        if(updateReq.getDesignation() != null) u.setDesignation(updateReq.getDesignation());
+        if(updateReq.getDepartment() != null) u.setDepartment(updateReq.getDepartment());
+
         u.setUpdatedAt(LocalDateTime.now());
         userRepository.save(u);
         return getProfile(userId);
