@@ -8,6 +8,7 @@ import com.configserverllp.csllp_learning_platform.user_service.util.ApiResponse
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public class UserController {
 //        return ResponseEntity.ok(exists);
 //    }
 
-
+    @PreAuthorize("hasRole('ADMIN','HR','MANAGER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers(
             @RequestParam(value = "managerId", required = false) Long managerId) {
