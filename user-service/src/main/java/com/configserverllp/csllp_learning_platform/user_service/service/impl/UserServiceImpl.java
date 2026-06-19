@@ -77,6 +77,15 @@ public class UserServiceImpl implements UserService {
         u.setDepartment(req.getDepartment());
         u.setAnnualSalary(req.getAnnualSalary());
         u.setDateOfJoining(req.getDateOfJoining());
+        u.setPhoneNumber(req.getPhoneNumber());
+        u.setAddress(req.getAddress());
+        u.setPanNumber(req.getPanNumber());
+        u.setPfNumber(req.getPfNumber());
+        u.setUanNumber(req.getUanNumber());
+        u.setBankName(req.getBankName());
+        u.setBankBranch(req.getBankBranch());
+        u.setBankAccountNumber(req.getBankAccountNumber());
+        u.setVendorCode(req.getVendorCode());
 
         // Set managerId for manager-created employee
         if ("MANAGER".equalsIgnoreCase(creatorRole)) u.setManagerId(creatorId);
