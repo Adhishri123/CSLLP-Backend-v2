@@ -5,6 +5,8 @@ import com.configserver.hrm.mappingService.dto.EmployeeDTO;
 import com.configserver.hrm.mappingService.dto.EmployeeIdMappingResponse;
 import com.configserver.hrm.mappingService.entity.EmployeeIdMapping;
 import com.configserver.hrm.mappingService.repository.EmployeeIdMappingRepository;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,8 +20,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 public class EmployeeIdMappingService {
@@ -282,6 +282,8 @@ public class EmployeeIdMappingService {
 
     private List<EmployeeDTO> extractEmployees(String responseBody) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         JsonNode root = mapper.readTree(responseBody);
 
         // ✅ Find array node
@@ -291,8 +293,9 @@ public class EmployeeIdMappingService {
             return new ArrayList<>();
         }
 
-        EmployeeDTO[] employees = mapper.treeToValue(employeesNode, EmployeeDTO[].class);
-        return Arrays.asList(employees);
+        // Convert to List<EmployeeDTO>
+        JavaType type = mapper.getTypeFactory().constructCollectionType(List.class, EmployeeDTO.class);
+        return mapper.readValue(employeesNode.traverse(), type);
     }
 
     private JsonNode findEmployeeArray(JsonNode root) {

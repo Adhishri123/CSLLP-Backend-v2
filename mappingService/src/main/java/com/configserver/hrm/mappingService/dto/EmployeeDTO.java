@@ -1,7 +1,10 @@
 package com.configserver.hrm.mappingService.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class EmployeeDTO {
     private Long id;
+    @JsonProperty("fullName")
     private String name;
     private String email;
     private String role;
