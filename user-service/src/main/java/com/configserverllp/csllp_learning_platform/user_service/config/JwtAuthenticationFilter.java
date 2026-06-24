@@ -40,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+        System.out.println("TOKEN = " + token);
 
         try {
 
@@ -53,11 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails =
                         userDetailsService
                                 .loadUserByUsername(email);
+                System.out.println("USERNAME = " + userDetails.getUsername());
+                System.out.println("AUTHORITIES = " + userDetails.getAuthorities());
 
                 if (jwtService.validateToken(
                         token,
                         userDetails.getUsername())) {
-
+                    System.out.println("JWT VALID");
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,

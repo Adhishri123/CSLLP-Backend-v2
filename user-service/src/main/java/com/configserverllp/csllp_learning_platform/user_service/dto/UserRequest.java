@@ -55,6 +55,10 @@ public class UserRequest {
     private String bankBranch;
     private String bankAccountNumber;
     private String vendorCode;
+    private String status;
 
+    public void setId(Long userId) {
+
+    }
 }
 

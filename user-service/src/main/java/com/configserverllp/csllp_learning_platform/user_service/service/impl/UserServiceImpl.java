@@ -1,5 +1,6 @@
 package com.configserverllp.csllp_learning_platform.user_service.service.impl;
 
+import com.configserverllp.csllp_learning_platform.user_service.client.AttendanceClient;
 import com.configserverllp.csllp_learning_platform.user_service.dto.*;
 import com.configserverllp.csllp_learning_platform.user_service.entity.Otp;
 import com.configserverllp.csllp_learning_platform.user_service.entity.Role;
@@ -9,24 +10,40 @@ import com.configserverllp.csllp_learning_platform.user_service.exception.Resour
 import com.configserverllp.csllp_learning_platform.user_service.repository.OtpRepository;
 import com.configserverllp.csllp_learning_platform.user_service.repository.UserRepository;
 import com.configserverllp.csllp_learning_platform.user_service.service.UserService;
+import jakarta.validation.Valid;
+import jdk.jshell.spi.ExecutionControl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 public class UserServiceImpl implements UserService {
-
+    @Autowired
+    private AttendanceClient attendanceClient;
+    @Autowired
+    //private EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate;
     // Add this field in UserServiceImpl class
     private final OtpRepository otpRepository;
+    private Object emailService;
+
+    //private Object Dto;
+
 
     public PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
@@ -41,6 +58,60 @@ public class UserServiceImpl implements UserService {
         this.otpRepository = otpRepository;
     }
 
+//@Override
+//    //public User createManualUser(UserRequest dto) {
+//      // Check if email already exists
+//       userRepository.findByEmail(dto.getEmail())
+//                .ifPresent(emp -> {
+//                    throw new BadRequestException("Email already registered!");
+//               });
+//
+//     // ✅ Restrict only one Admin
+//     if (dto.getRole() == Role.ADMIN) {
+//           long adminCount = userRepository.findAll().stream()
+//                  .filter(emp -> emp.getRole() == Role.ADMIN)
+//                    .count();
+//
+//          if (adminCount >= 1) {
+//               throw new ExecutionControl.UserException("Only one ADMIN allowed in the system!");
+//           }
+//     }
+
+    /// /Generate password
+//   String rawPassword = String.valueOf(passwordEncoder.getClass());
+//   String hashedPassword = passwordEncoder.encode(rawPassword);
+//
+//   // Create user
+//   User user = new User();
+//       user.setFullName(dto.getFullName());
+//        user.setEmail(dto.getEmail());
+//       user.setRole(dto.getRole());
+//        user.setDesignation(dto.getDesignation());
+//       user.setDepartment(dto.getDepartment());
+//        user.setAnnualSalary(dto.getAnnualSalary());
+//        user.setStatus(dto.getStatus() != null ? dto.getStatus() : "Active");
+//      user.setPassword(hashedPassword);
+//        user.setDateOfJoining(dto.getDateOfJoining());
+//
+//   // ✅ Add new fields
+//        user.setPhoneNumber(dto.getPhoneNumber());
+//       user.setAddress(dto.getAddress());
+//       user.setPanNumber(dto.getPanNumber());
+//        user.setPfNumber(dto.getPfNumber());
+//        user.setUanNumber(dto.getUanNumber());
+//        user.setBankName(dto.getBankName());
+//      user.setBankBranch(dto.getBankBranch());
+//       user.setBankAccountNumber(dto.getBankAccountNumber());
+//      user.setVendorCode(dto.getVendorCode());
+//
+//   // Save employee
+//      userRepository.save(user);
+//
+//   // Send credentials
+//       emailService.sendPasswordEmail(dto.getEmail(),rawPassword);
+//
+//        return user;
+//}
     @Override
     public User createUser(UserRequest req, Long creatorId, String creatorRole) {
         if (userRepository.existsByEmail(req.getEmail())) {
@@ -270,10 +341,10 @@ public class UserServiceImpl implements UserService {
         if (updateReq.getProfilePhotoUrl() != null) {
             u.setProfilePhotoUrl(updateReq.getProfilePhotoUrl());
         }
-        if(updateReq.getPhoneNumber() != null) u.setPhoneNumber(updateReq.getPhoneNumber());
-        if(updateReq.getAddress() != null) u.setAddress(updateReq.getAddress());
-        if(updateReq.getDesignation() != null) u.setDesignation(updateReq.getDesignation());
-        if(updateReq.getDepartment() != null) u.setDepartment(updateReq.getDepartment());
+        if (updateReq.getPhoneNumber() != null) u.setPhoneNumber(updateReq.getPhoneNumber());
+        if (updateReq.getAddress() != null) u.setAddress(updateReq.getAddress());
+        if (updateReq.getDesignation() != null) u.setDesignation(updateReq.getDesignation());
+        if (updateReq.getDepartment() != null) u.setDepartment(updateReq.getDepartment());
 
         u.setUpdatedAt(LocalDateTime.now());
         userRepository.save(u);
@@ -435,6 +506,7 @@ public class UserServiceImpl implements UserService {
             // Don't throw exception here as password is already reset
         }
     }
+
     @Override
     public List<UserSearchResponse> searchUsersForAssignments(String query, String role) {
         List<User> users = searchUsers(query);
@@ -455,7 +527,66 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    // @Override
+    public UserPackageDto getUserPackage(Long id) {
+        User emp = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+
+
+        return new UserPackageDto(
+                emp.getId(),
+                emp.getFullName(),
+                emp.getDesignation(),
+                emp.getRole().name(),
+                emp.getAnnualSalary(),
+                emp.getDateOfJoining()
+        );
+    }
+
+    @Override
+    public void registerUserFromAttendance() {
+        List<Map<String, Object>> attendanceUser = attendanceClient.fetchUserFromAttendance();
+
+
+        if (attendanceUser == null || attendanceUser.isEmpty()) {
+            System.out.println("No user fetched from attendance service");
+            return;
+        }
+
+        for (Map<String, Object> empData : attendanceUser) {
+            if (empData == null) continue;  // skip null entries
+
+            String email = (String) empData.get("email");
+            String fullName = (String) empData.get("name");
+            String userIdStr = (String) empData.get("userId");
+            Long userId = null;
+            if (userIdStr != null && !userIdStr.isEmpty()) {
+                try {
+                    userId = Long.parseLong(userIdStr);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid Long: " + userIdStr);
+                }
+                if (email == null || email.isEmpty()) continue; // skip invalid emails
+                if (userRepository.findByEmail(email).isEmpty()) {
+                    UserRequest dto = new UserRequest();
+                    dto.setFullName(fullName != null ? fullName : "Unknown");
+                    dto.setEmail(email);
+                    dto.setRole(Role.EMPLOYEE);
+                    dto.setId(userId);
+                    createUser(dto, null, "ADMIN");
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public User createManualUser(UserRequest dto) {
+        return null;
+    }
+
 }
+
 
 //package com.configserverllp.csllp_learning_platform.user_service.service.impl;
 //

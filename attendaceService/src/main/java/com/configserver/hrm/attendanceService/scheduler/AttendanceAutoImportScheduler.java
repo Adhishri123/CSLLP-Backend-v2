@@ -16,7 +16,7 @@ public class AttendanceAutoImportScheduler {
     @Autowired
     private LocalFileImportService localFileImportService;
 
-    private static final String FILE_PATH = "F:\\ConfigServerLlp\\HRMS-Backend\\attendaceService\\src\\monthperformance01062026185649.xls";
+    private static final String FILE_PATH = "E:\\E-Learning\\CSLLP-Backend-v2\\attendaceService\\src\\monthperformance01062026185649.xls";
     private static final boolean ENABLED = true;
 
     // Run every day at 10:00 AM
