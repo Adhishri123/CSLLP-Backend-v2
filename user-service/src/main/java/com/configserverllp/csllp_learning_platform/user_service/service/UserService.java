@@ -2,10 +2,16 @@ package com.configserverllp.csllp_learning_platform.user_service.service;
 
 import com.configserverllp.csllp_learning_platform.user_service.dto.*;
 import com.configserverllp.csllp_learning_platform.user_service.entity.User;
+import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface UserService {
+
+
+
+
     User createUser(UserRequest req, Long creatorId, String creatorRole);
     User getUserById(Long id);
     User updateUser(Long id, UserRequest update);
@@ -33,5 +39,11 @@ public interface UserService {
     boolean resetPassword(String email, String otp, String newPassword);
 
     List<UserSearchResponse> searchUsersForAssignments(String query, String role);
+    //User createManualUser(UserRequest userDTO);
+    UserPackageDto getUserPackage(Long id);
+
+    void registerUserFromAttendance();
+
+    User createManualUser(@Valid UserRequest dto);
 
 }

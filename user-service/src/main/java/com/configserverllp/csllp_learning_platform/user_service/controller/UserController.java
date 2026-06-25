@@ -7,10 +7,18 @@ import com.configserverllp.csllp_learning_platform.user_service.service.UserServ
 import com.configserverllp.csllp_learning_platform.user_service.util.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,7 +146,7 @@ public class UserController {
         List<User> teamMembers = userService.getUsersByManagerId(managerId);
         List<UserResponse> resp = teamMembers.stream()
 //                .filter(user -> "EMPLOYEE".equals(user.getRole())) // Only return EMPLOYEES, not other managers
-                .filter(user ->  user.getRole() == Role.EMPLOYEE) // Only return EMPLOYEES, not other managers
+                .filter(user -> user.getRole() == Role.EMPLOYEE) // Only return EMPLOYEES, not other managers
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new ApiResponse<>(true, "Manager team fetched", resp));
@@ -187,6 +195,28 @@ public class UserController {
                 .vendorCode(u.getVendorCode())
                 .build();
     }
+
+
+    // ✅ New API: Fetch Users from Attendance and register
+    @PostMapping("/import-from-attendance")
+    public ResponseEntity<String> importUserFromAttendance() {
+        userService.registerUserFromAttendance();
+        return ResponseEntity.ok("User imported from Attendance successfully!");
+    }
+    //@PostMapping("/create-manual")
+    @PreAuthorize("hasAnyRole('ADMIN','HR','MANAGER')")
+    public ResponseEntity<User> createManualUser(@Valid @RequestBody UserRequest dto) {
+        return ResponseEntity.ok(userService.createManualUser(dto));
+    }
+
+    @GetMapping("/{id}/package")
+    public ResponseEntity<UserPackageDto> getUserPackage(@PathVariable Long id) {
+        UserPackageDto dto = userService.getUserPackage(id);
+        return ResponseEntity.ok(dto);
+    }
+
+
+
 
 //    // ADD SEARCH ENDPOINT:
 //    @GetMapping("/search")
