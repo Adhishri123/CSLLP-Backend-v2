@@ -93,6 +93,7 @@ public class MaterialServiceImpl implements MaterialService {
 //                        Map.class
 //                );
         Map<String,Object> apiResp = restTemplate.getForObject(userServiceBaseUrl + "/api/users/" + request.getUploadedBy(), Map.class);
+//        Map<String,Object> apiResp = restTemplate.getForObject("http://localhost:8081" + "/api/users/" + request.getUploadedBy(), Map.class);
 
         if (apiResp == null || apiResp.get("data") == null) {
             throw new BadRequestException("Uploader not found in User Service");

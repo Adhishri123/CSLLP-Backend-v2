@@ -34,46 +34,4 @@ public class CustomUserDetail implements UserDetailsService {
                 .build();
     }
 
-//    private User user;
-//
-//    public CustomUserDetail(User user) {
-//        this.user = user;
-//    }
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-////    List<SimpleGrantedAuthority> list = user.getRole().stream().map( role -> new SimpleGrantedAuthority(role.getFirstName())).toList();
-//        return List.of(new SimpleGrantedAuthority(user.getRole()));
-//    }
-//
-//    @Override
-//    public String getPassword() {
-//        return user.getPassword();
-//    }
-//
-//    @Override
-//    public String getUsername() {
-//        return user.getEmail();
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return user.isEnabled();
-//    }
-
 }

@@ -11,8 +11,8 @@ import java.util.Date;
 @Service
 public class JWTService {
 
-    @Value("${jwt.secret:mySecretKeyForJwtGenerationAndValidation123456}")
-    private String secret;
+        @Value("${jwt.secret:mySecretKeyForJwtGenerationAndValidation123456}")
+        private String secret;
 
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
