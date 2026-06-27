@@ -160,17 +160,30 @@ public class PayrollController {
             @RequestParam Long employeeId,
             @RequestParam int month,
             @RequestParam int year,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
+            System.out.println("📥 Downloading payslip for employee: " + employeeId +
+                    ", month: " + month + ", year: " + year);
+            System.out.println("🔑 Auth Header: " + (authHeader != null ? "Present" : "Missing"));
+
+            // Generate payslip and PDF
             byte[] pdfBytes = payrollService.generatePayslipPdf(employeeId, month, year, authHeader);
+
+            if (pdfBytes == null || pdfBytes.length == 0) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            String filename = String.format("Payslip_%s_%d_%d.pdf", employeeId, month, year);
+            String filename = String.format("Payslip_%d_%d_%d.pdf", employeeId, month, year);
             headers.setContentDispositionFormData("attachment", filename);
 
+            System.out.println("✅ PDF generated successfully. Size: " + pdfBytes.length + " bytes");
+
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
         } catch (Exception e) {
+            System.err.println("❌ Error generating payslip: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(("Error generating payslip: " + e.getMessage()).getBytes());
