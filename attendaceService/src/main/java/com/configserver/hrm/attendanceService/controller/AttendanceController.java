@@ -298,31 +298,6 @@ public class AttendanceController {
         }
     }
 
-
-    /**
-     * Import from local file path (calls the existing API internally)
-     */
-    @PostMapping("/import/from-local-path")
-    public ResponseEntity<?> importFromLocalPath(
-            @RequestParam(defaultValue = "F:/ConfigServerLlp/HRMS-Backend/attendaceService/src/monthperformance01062026185649.xls")
-            String filePath,
-            @RequestParam(required = false, defaultValue = "ETIME_MONTHLY")
-            String sourceType) {
-
-        try {
-            System.out.println("=== Importing from local file path ===");
-            System.out.println("File path: " + filePath);
-
-            Map<String, Object> result = localFileImportService.importDirectly(filePath, sourceType);
-
-            return ResponseEntity.ok(result);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
 }
 
 
