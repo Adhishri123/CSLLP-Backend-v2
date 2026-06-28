@@ -13,6 +13,7 @@ import com.configserverllp.csllp_learning_platform.user_service.service.UserServ
 import jakarta.validation.Valid;
 import jdk.jshell.spi.ExecutionControl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,6 +63,9 @@ public class UserServiceImpl implements UserService {
         this.restTemplate = restTemplate;
         this.otpRepository = otpRepository;
     }
+
+    @Value("${file.upload-dir:./uploads/profiles}")
+    private String uploadDir;
 
 //@Override
 //    //public User createManualUser(UserRequest dto) {
@@ -338,9 +347,9 @@ public class UserServiceImpl implements UserService {
         if (updateReq.getPassword() != null && !updateReq.getPassword().isBlank()) {
             u.setPassword(passwordEncoder.encode(updateReq.getPassword()));
         }
-        if (updateReq.getProfilePhotoUrl() != null) {
-            u.setProfilePhotoUrl(updateReq.getProfilePhotoUrl());
-        }
+//        if (updateReq.getProfilePhotoUrl() != null) {
+//            u.setProfilePhotoUrl(updateReq.getProfilePhotoUrl());
+//        }
         if (updateReq.getPhoneNumber() != null) u.setPhoneNumber(updateReq.getPhoneNumber());
         if (updateReq.getAddress() != null) u.setAddress(updateReq.getAddress());
         if (updateReq.getDesignation() != null) u.setDesignation(updateReq.getDesignation());
@@ -584,6 +593,67 @@ public class UserServiceImpl implements UserService {
     public User createManualUser(UserRequest dto) {
         return null;
     }
+
+//    @Override
+//    public User getCurrentUserProfile(String email) {
+//        return userRepository.findByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
+//    }
+//
+//    @Override
+//    public String updateProfileImage(Long id, MultipartFile profileImage) {
+//        if (profileImage.isEmpty()) {
+//            throw new RuntimeException("Profile image cannot be empty");
+//        }
+//
+//        User employee = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+//
+//        try {
+//            // Delete old image if exists
+//            if (employee.getProfilePhotoUrl() != null) {
+//                Path oldImagePath = Paths.get(employee.getProfilePhotoUrl());
+//                Files.deleteIfExists(oldImagePath);
+//            }
+//
+//            // Save new image
+//            String imagePath = saveProfileImage(profileImage, id);
+//            employee.setProfilePhotoUrl(imagePath);
+//            userRepository.save(employee);
+//
+//            return imagePath;
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to update profile image: " + e.getMessage());
+//        }
+//    }
+//
+//    private String saveProfileImage(MultipartFile file, Long employeeId) {
+//        try {
+//            // Create upload directory if it doesn't exist
+//            Path uploadPath = Paths.get(uploadDir);
+//            if (!Files.exists(uploadPath)) {
+//                Files.createDirectories(uploadPath);
+//            }
+//
+//            // Generate unique filename
+//            String fileExtension = getFileExtension(file.getOriginalFilename());
+//            String fileName = employeeId + "_" + System.currentTimeMillis() + fileExtension;
+//            Path filePath = uploadPath.resolve(fileName);
+//
+//            // Save file
+//            Files.copy(file.getInputStream(), filePath);
+//
+//            return filePath.toString();
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to save profile image: " + e.getMessage());
+//        }
+//    }
+//
+//    private String getFileExtension(String fileName) {
+//        if (fileName == null) return ".jpg";
+//        int lastIndex = fileName.lastIndexOf(".");
+//        return lastIndex == -1 ? ".jpg" : fileName.substring(lastIndex);
+//    }
 
 }
 

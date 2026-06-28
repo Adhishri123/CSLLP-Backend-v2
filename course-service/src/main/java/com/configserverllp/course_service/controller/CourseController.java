@@ -64,6 +64,16 @@ public class CourseController {
         return ResponseEntity.ok(ApiResponse.success("Enrollment submitted", courseService.enrollCourse(request)));
     }
 
+    @GetMapping("/enrollments/all")
+    public ResponseEntity<ApiResponse<List<Enrollment>>> getAllEnrollments() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "All enrollments fetched",
+                        courseService.getAllEnrollments()
+                )
+        );
+    }
+
     @PutMapping("/enrollments/{id}/approve")
     public ResponseEntity<ApiResponse<Enrollment>> approve(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Enrollment approved", courseService.approveEnrollment(id)));

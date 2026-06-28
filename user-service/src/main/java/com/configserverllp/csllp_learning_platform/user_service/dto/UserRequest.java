@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -40,6 +41,9 @@ public class UserRequest {
     private String password;
 
     private String profilePhotoUrl; // NEW
+
+    // For image upload (not persisted in database directly)
+//    private transient MultipartFile profilePhotoUrl;
 
     private String phoneNumber;
     private String address;
