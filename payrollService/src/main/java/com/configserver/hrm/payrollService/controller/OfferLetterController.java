@@ -47,7 +47,8 @@ public class OfferLetterController {
                             .accepted(false)
                             .build());
 
-            String acceptanceLink = "http://localhost:3000/offer-acceptance?employeeId=" + employeeId;
+            // ✅ FIXED: Correct URL path - "offer-accept" not "offer-acceptance"
+            String acceptanceLink = "http://localhost:3000/offer-accept?employeeId=" + employeeId;
 
             // For now using default email - in production, fetch from employee service
             String defaultEmail = "employee@configserverllp.com";
@@ -221,7 +222,8 @@ public class OfferLetterController {
             status.setEmployeeEmail(employeeEmail);
             status.setEmployeeName(employeeName);
 
-            String acceptanceLink = "http://localhost:3000/offer-acceptance?employeeId=" + employeeId;
+            // ✅ FIXED: Correct URL path - "offer-accept" not "offer-acceptance"
+            String acceptanceLink = "http://localhost:3000/offer-accept?employeeId=" + employeeId;
 
             // ✅ SEND ONLY ACCEPTANCE LINK (no download in initial email)
             boolean emailSent = emailService.sendOfferEmail(employeeId, employeeEmail, employeeName, acceptanceLink);
@@ -250,11 +252,12 @@ public class OfferLetterController {
         try {
             System.out.println("🧪 Testing email configuration to: " + testEmail);
 
+            // ✅ FIXED: Correct URL path
             boolean emailSent = emailService.sendOfferEmail(
                     1L,
                     testEmail,
                     "Test Employee",
-                    "http://localhost:3000/offer-acceptance?employeeId=test"
+                    "http://localhost:3000/offer-accept?employeeId=test"
             );
 
             if (emailSent) {

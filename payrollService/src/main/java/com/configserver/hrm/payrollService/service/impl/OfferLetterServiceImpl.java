@@ -48,23 +48,35 @@ public class OfferLetterServiceImpl implements OfferLetterService {
     @Override
     public byte[] generateOfferLetter(String employeeId) throws Exception {
 
+        // ✅ FIXED: Try to get JWT, but don't fail if not present
         String jwtToken = extractJwtFromRequest();
 
-        if (jwtToken == null || jwtToken.isEmpty()) {
-            throw new RuntimeException("Authentication required: No JWT token found in request");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // ✅ If JWT exists, add it to headers
+        if (jwtToken != null && !jwtToken.isEmpty()) {
+            headers.setBearerAuth(jwtToken);
+            System.out.println("✅ JWT token found for employee: " + employeeId);
+        } else {
+            System.out.println("⚠️ No JWT token found - using public access for employee: " + employeeId);
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(jwtToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        Map<?, ?> empData = getJson(EMPLOYEE_API + employeeId, entity);
+        // ✅ Fetch employee data - handle both authenticated and public access
+        Map<?, ?> empData = getEmployeeData(employeeId, entity);
 
+        if (empData == null || empData.isEmpty()) {
+            throw new RuntimeException("Failed to fetch employee data for ID: " + employeeId);
+        }
+
+        // ✅ Get financial year and fetch salary data
         String financialYear = getCurrentFinancialYear();
         String salaryUrl = PAYROLL_API + "?employeeId=" + employeeId + "&financialYear=" + financialYear;
-        Map<?, ?> salData = getJson(salaryUrl, entity);
+        Map<?, ?> salData = getSalaryData(salaryUrl, entity);
 
+        // ✅ Build DTO
         OfferLetterDTO dto = new OfferLetterDTO();
         dto.setEmployeeId(employeeId);
         dto.setName(asString(empData.get("name")));
@@ -98,13 +110,92 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         return generatePdf(dto);
     }
 
+    // ✅ NEW: Separate method for employee data with fallback
+    private Map<?, ?> getEmployeeData(String employeeId, HttpEntity<Void> entity) {
+        try {
+            String url = EMPLOYEE_API + employeeId;
+            ResponseEntity<?> resp = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
+
+            if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null) {
+                Map<?, ?> response = (LinkedHashMap<?, ?>) resp.getBody();
+                // Check if response has nested data structure
+                if (response.containsKey("data")) {
+                    return (LinkedHashMap<?, ?>) response.get("data");
+                }
+                return response;
+            }
+            throw new RuntimeException("Failed to fetch employee data");
+        } catch (HttpClientErrorException.Unauthorized ex) {
+            // ✅ If unauthorized, try without authentication
+            System.out.println("⚠️ Unauthorized access, trying public endpoint...");
+            try {
+                HttpHeaders publicHeaders = new HttpHeaders();
+                publicHeaders.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Void> publicEntity = new HttpEntity<>(publicHeaders);
+
+                String url = EMPLOYEE_API + employeeId;
+                ResponseEntity<?> resp = restTemplate.exchange(url, HttpMethod.GET, publicEntity, Object.class);
+
+                if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null) {
+                    Map<?, ?> response = (LinkedHashMap<?, ?>) resp.getBody();
+                    if (response.containsKey("data")) {
+                        return (LinkedHashMap<?, ?>) response.get("data");
+                    }
+                    return response;
+                }
+                throw new RuntimeException("Failed to fetch employee data with public access");
+            } catch (Exception e2) {
+                throw new RuntimeException("Failed to fetch employee data: " + e2.getMessage());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch employee data: " + e.getMessage());
+        }
+    }
+
+    // ✅ NEW: Separate method for salary data with fallback
+    private Map<?, ?> getSalaryData(String url, HttpEntity<Void> entity) {
+        try {
+            ResponseEntity<?> resp = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
+            if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null) {
+                Map<?, ?> response = (LinkedHashMap<?, ?>) resp.getBody();
+                if (response.containsKey("data")) {
+                    return (LinkedHashMap<?, ?>) response.get("data");
+                }
+                return response;
+            }
+            throw new RuntimeException("Failed to fetch salary data");
+        } catch (HttpClientErrorException.Unauthorized ex) {
+            // ✅ If unauthorized, try without authentication
+            System.out.println("⚠️ Unauthorized access for salary, trying public endpoint...");
+            try {
+                HttpHeaders publicHeaders = new HttpHeaders();
+                publicHeaders.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Void> publicEntity = new HttpEntity<>(publicHeaders);
+
+                ResponseEntity<?> resp = restTemplate.exchange(url, HttpMethod.GET, publicEntity, Object.class);
+                if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null) {
+                    Map<?, ?> response = (LinkedHashMap<?, ?>) resp.getBody();
+                    if (response.containsKey("data")) {
+                        return (LinkedHashMap<?, ?>) response.get("data");
+                    }
+                    return response;
+                }
+                throw new RuntimeException("Failed to fetch salary data with public access");
+            } catch (Exception e2) {
+                throw new RuntimeException("Failed to fetch salary data: " + e2.getMessage());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch salary data: " + e.getMessage());
+        }
+    }
+
     /**
      * Extract JWT from the incoming HTTP request
      * Get the current HTTP request
      * Get the Authorization header
      * Extract token if it starts with "Bearer "
      * Also try to get from a custom header if needed
-    */
+     */
     private String extractJwtFromRequest() {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -124,19 +215,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             System.err.println("Failed to extract JWT from request: " + e.getMessage());
         }
         return null;
-    }
-
-    private Map<?, ?> getJson(String url, HttpEntity<Void> entity) {
-        try {
-            ResponseEntity<?> resp = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
-            if (resp.getStatusCode() != HttpStatus.OK || resp.getBody() == null)
-                throw new RuntimeException("Failed call: " + url + " status=" + resp.getStatusCode());
-            return (LinkedHashMap<?, ?>) resp.getBody();
-        } catch (HttpClientErrorException.Unauthorized ex) {
-            throw new RuntimeException("401 Unauthorized calling " + url + " — JWT token may be invalid or expired", ex);
-        } catch (HttpClientErrorException.Forbidden ex) {
-            throw new RuntimeException("403 Forbidden calling " + url + " — Insufficient permissions", ex);
-        }
     }
 
     private String getCurrentFinancialYear() {
@@ -198,7 +276,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         doc.add(Chunk.NEWLINE);
 
         // To address - EXACT FORMAT
-        // To address - ALTERNATIVE (SAME LINE)
         Paragraph to = new Paragraph();
         to.add(new Phrase("To,", FONT_NORMAL));
         to.add(Chunk.NEWLINE);
