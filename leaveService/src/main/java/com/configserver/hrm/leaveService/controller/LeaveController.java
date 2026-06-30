@@ -6,7 +6,6 @@ import com.configserver.hrm.leaveService.entity.EmployeeLeave;
 import com.configserver.hrm.leaveService.entity.LeaveType;
 import com.configserver.hrm.leaveService.external.MappingServiceClient;
 import com.configserver.hrm.leaveService.service.LeaveService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/leaves")
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class LeaveController {
 
     @Autowired

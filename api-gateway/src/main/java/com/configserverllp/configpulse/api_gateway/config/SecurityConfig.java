@@ -41,8 +41,10 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
-                                "/api/auth/verify-otp"
-//                                "/api/users/**"
+                                "/api/auth/verify-otp",
+                                "/api/payroll/offer-letter/status/**",
+                                "/api/payroll/offer-letter/accept",
+                                "/api/payroll/offer-letter/download"
                         ).permitAll()
 
                         // Role-based endpoints (Gateway just passes through)
