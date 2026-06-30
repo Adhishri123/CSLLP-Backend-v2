@@ -46,4 +46,8 @@ public interface UserService {
 
     User createManualUser(@Valid UserRequest dto);
 
+
+//    User getCurrentUserProfile(String email);
+//
+//    String updateProfileImage(Long id, MultipartFile profileImage);
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/courses")
 @RequiredArgsConstructor
@@ -62,6 +62,16 @@ public class CourseController {
     @PostMapping("/enroll")
     public ResponseEntity<ApiResponse<Enrollment>> enroll(@Valid @RequestBody EnrollmentRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Enrollment submitted", courseService.enrollCourse(request)));
+    }
+
+    @GetMapping("/enrollments/all")
+    public ResponseEntity<ApiResponse<List<Enrollment>>> getAllEnrollments() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "All enrollments fetched",
+                        courseService.getAllEnrollments()
+                )
+        );
     }
 
     @PutMapping("/enrollments/{id}/approve")

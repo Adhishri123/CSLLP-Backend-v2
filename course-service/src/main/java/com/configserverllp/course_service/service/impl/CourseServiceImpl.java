@@ -322,6 +322,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public List<Enrollment> getAllEnrollments() {
+        return enrollmentRepository.findAll();
+    }
+
+    @Override
     public Enrollment approveEnrollment(Long enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));

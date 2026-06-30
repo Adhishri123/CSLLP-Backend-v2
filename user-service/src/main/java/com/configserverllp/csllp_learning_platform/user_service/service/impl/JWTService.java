@@ -57,39 +57,5 @@ public class JWTService {
         return extractUsername(token).equals(email);
     }
 
-//    private static final String SECRET_KEY = "MyVeryStrongSecretKeyForJwtAuthentication2026LearningPlatform";
-//    private static final long ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000;
-//    private static final long REFRESH_TOKEN_EXPIRATION = 48 * 60 * 60 * 1000;
-//
-//    //GENERATE TOKEN
-//    public String generateToken(String username, boolean isAccessToken) {
-//        long expiration = isAccessToken ? ACCESS_TOKEN_EXPIRATION : REFRESH_TOKEN_EXPIRATION;
-//
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-//                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-//
-//    // GENERATE NAME FROM TOKEN
-//    public String getUsernameFromToken(String token) {
-//        return Jwts.parser().setSigningKey(SECRET_KEY.getBytes())
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .getSubject();
-//    }
-//
-//    //VALIDATE
-//    public boolean validateToken(String token) {
-//        try {
-//            Jwts.parser().setSigningKey(SECRET_KEY.getBytes()).build().parseClaimsJws(token);
-//            return true;
-//        } catch(JwtException ex) {
-//            return false;
-//        }
-//    }
 
 }

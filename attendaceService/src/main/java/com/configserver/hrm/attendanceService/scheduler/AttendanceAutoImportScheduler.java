@@ -16,7 +16,7 @@ public class AttendanceAutoImportScheduler {
     @Autowired
     private LocalFileImportService localFileImportService;
 
-    private static final String FILE_PATH = "F:\\E Learning\\CSLLP-Backend-v2\\attendaceService\\src\\monthperformance01062026185649.xls";
+    private static final String FILE_PATH = "D:\\Backend-csllp\\CSLLP-EELP-backend-feature-CS8089-Course-Service-add-missing-endpoint\\attendaceService\\src\\monthperformance01062026185649.xls";
     private static final boolean ENABLED = true;
 
     // Run every day at 10:00 AM

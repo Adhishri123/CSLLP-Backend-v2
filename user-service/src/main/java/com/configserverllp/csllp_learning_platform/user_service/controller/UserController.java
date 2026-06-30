@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,7 +63,7 @@ public class UserController {
 //    @GetMapping("/{id}/exists")
 //    public ResponseEntity<Boolean> checkUserExists(@PathVariable Long id) {
 //        boolean exists = userService.existsById(id);
-//        return ResponseEntity.ok(exists);
+//        return RespognseEntity.ok(exists);
 //    }
 
     @PreAuthorize("hasRole('ADMIN','HR','MANAGER')")
@@ -215,7 +216,15 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-
+//    @PostMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<String> uploadProfileImage(@RequestParam("image") MultipartFile image) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//        User currentUser = userService.getCurrentUserProfile(email);
+//
+//        String imagePath = userService.updateProfileImage(currentUser.getId(), image);
+//        return ResponseEntity.ok("Profile image uploaded successfully: " + imagePath);
+//    }
 
 
 //    // ADD SEARCH ENDPOINT:

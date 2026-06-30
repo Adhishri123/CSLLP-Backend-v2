@@ -61,4 +61,6 @@ public interface CourseService {
     void checkAndSendProgressReminders();
     List<Map<String, Object>> getEnrollmentsNeedingReminders();
     void sendAutomaticReminderForEnrollment(Long enrollmentId);
+
+    List<Enrollment> getAllEnrollments();
 }
