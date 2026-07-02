@@ -450,43 +450,13 @@ public class PayrollServiceImpl implements PayrollService {
             String authHeader
     ) throws DocumentException {
 
-        System.out.println("📄 PDF Generation Started");
-        System.out.println("   Employee ID: " + employeeId);
-        System.out.println("   Month: " + month);
-        System.out.println("   Year: " + year);
+        System.out.println("PDF Method Called");
+        System.out.println("AUTH HEADER = " + authHeader);
 
-        try {
-            PayslipDTO payslip;
+        PayslipDTO payslip =
+                generatePayslip(employeeId, month, year, authHeader);
 
-            // 1️⃣ Check if payslip already exists
-            YearMonth ym = YearMonth.of(year, month);
-            Optional<Payslip> existingPayslip = payslipRepository
-                    .findByEmployeeIdAndMonth(employeeId, ym.atEndOfMonth());
-
-            if (existingPayslip.isPresent()) {
-                System.out.println("✅ Existing payslip found with ID: " + existingPayslip.get().getId());
-                payslip = MapperUtil.toDTO(existingPayslip.get());
-            } else {
-                System.out.println("📝 No existing payslip found. Generating new one...");
-                payslip = generatePayslip(employeeId, month, year, authHeader);
-            }
-
-            if (payslip == null) {
-                throw new PayrollException("Failed to get payslip");
-            }
-
-            // 2️⃣ Generate PDF
-            byte[] pdfBytes = pdfGenerationService.generatePayslipPdf(payslip);
-
-            System.out.println("✅ PDF generated successfully. Size: " + pdfBytes.length + " bytes");
-
-            return pdfBytes;
-
-        } catch (Exception e) {
-            System.err.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
-            throw new PayrollException("Error generating payslip PDF: " + e.getMessage());
-        }
+        return pdfGenerationService.generatePayslipPdf(payslip);
     }
 
 
