@@ -263,7 +263,8 @@ public class ExamServiceImpl implements ExamService {
     public List<EmployeeResultDTO> getEmployeeResults(Long employeeId) {
         if (employeeId == null) throw new BadRequestException("Employee ID is required");
 
-        List<ExamAttempt> attempts = attemptRepository.findByEmployeeId(employeeId);
+//        List<ExamAttempt> attempts = attemptRepository.findByEmployeeId(employeeId);
+        List<ExamAttempt> attempts = attemptRepository.findByEmployeeId(employeeId).stream().filter(a -> "COMPLETED".equals(a.getStatus())).toList();
         if (attempts.isEmpty()) {
             throw new ResourceNotFoundException("No exam results found for this employee");
         }
@@ -277,8 +278,10 @@ public class ExamServiceImpl implements ExamService {
             List<Question> questions = questionRepository.findByExamId(exam.getId());
             Integer totalMarks = questions.stream().mapToInt(Question::getMarks).sum();
 
+            Double score = attempt.getScore() == null ? 0.0: attempt.getScore();
+
             // Calculate percentage
-            Double percentage = totalMarks > 0 ? (attempt.getScore() / totalMarks) * 100 : 0.0;
+            Double percentage = totalMarks > 0 ? (score / totalMarks) * 100 : 0.0;
 
             // Calculate grade
             String grade = calculateGrade(percentage);
@@ -289,7 +292,7 @@ public class ExamServiceImpl implements ExamService {
                     .examTitle(exam.getTitle())
                     .courseId(exam.getCourseId())
                     .courseName((String) courseInfo.get("courseName"))
-                    .score(attempt.getScore())
+                    .score(score)
                     .totalMarks(totalMarks)
                     .percentage(percentage)
                     .status(attempt.getStatus())
@@ -703,7 +706,12 @@ public class ExamServiceImpl implements ExamService {
             Integer totalMarks = questions.stream().mapToInt(Question::getMarks).sum();
 
             // Calculate percentage and grade
-            Double percentage = totalMarks > 0 ? (attempt.getScore() / totalMarks) * 100 : 0.0;
+//            Double percentage = totalMarks > 0 ? (attempt.getScore() / totalMarks) * 100 : 0.0;
+            Double score = Optional.ofNullable(attempt.getScore()).orElse(0.0);
+
+            Double percentage = totalMarks > 0
+                    ? (score / totalMarks) * 100
+                    : 0.0;
             String grade = calculateGrade(percentage);
 
             // Calculate correct and wrong answers
@@ -748,7 +756,8 @@ public class ExamServiceImpl implements ExamService {
                     .employeeEmail(employeeEmail)
                     .courseId(exam.getCourseId())
                     .courseName((String) courseInfo.get("courseName"))
-                    .score(attempt.getScore())
+//                    .score(attempt.getScore())
+                    .score(score)
                     .totalMarks(totalMarks)
                     .status(attempt.getStatus())
                     .startedAt(attempt.getStartedAt())
@@ -936,20 +945,27 @@ public class ExamServiceImpl implements ExamService {
                 Map<String, Object> employeeData = (Map<String, Object>) userResp.get("data");
 
                 // ✅ CORRECTED: Extract firstName and lastName from the nested data
-                String firstName = (String) employeeData.get("firstName");
-                String lastName = (String) employeeData.get("lastName");
+//                String firstName = (String) employeeData.get("firstName");
+//                String lastName = (String) employeeData.get("lastName");
+                String fullName = (String) employeeData.get("fullName");
                 String email = (String) employeeData.get("email");
 
-                System.out.println("👤 Extracted - First: " + firstName + ", Last: " + lastName + ", Email: " + email);
+//                System.out.println("👤 Extracted - First: " + firstName + ", Last: " + lastName + ", Email: " + email);
+                System.out.println("👤 Extracted - Full Name: " + fullName +  ", Email: " + email);
 
                 // Build employee name
                 String employeeName;
-                if (firstName != null && lastName != null) {
-                    employeeName = firstName + " " + lastName;
-                } else if (firstName != null) {
-                    employeeName = firstName;
-                } else if (lastName != null) {
-                    employeeName = lastName;
+//                if (firstName != null && lastName != null) {
+//                    employeeName = firstName + " " + lastName;
+//                } else if (firstName != null) {
+//                    employeeName = firstName;
+//                } else if (lastName != null) {
+//                    employeeName = lastName;
+//                } else {
+//                    employeeName = "Employee " + employeeId;
+//                }
+                if (fullName != null) {
+                    employeeName = fullName;
                 } else {
                     employeeName = "Employee " + employeeId;
                 }
@@ -958,8 +974,8 @@ public class ExamServiceImpl implements ExamService {
                         "employeeName", employeeName,
                         "employeeEmail", email != null ? email : "unknown@example.com",
                         "department", employeeData.getOrDefault("department", "Unknown Department"),
-                        "firstName", firstName,
-                        "lastName", lastName
+                        "fullName", fullName
+//                        "lastName", lastName
                 );
             } else {
                 System.out.println("⚠️ No employee data found for ID: " + employeeId);
@@ -974,8 +990,8 @@ public class ExamServiceImpl implements ExamService {
                 "employeeName", "Employee " + employeeId,
                 "employeeEmail", "unknown@example.com",
                 "department", "Unknown Department",
-                "firstName", null,
-                "lastName", null
+                "fullName", null
+//                "lastName", null
         );
     }
 
