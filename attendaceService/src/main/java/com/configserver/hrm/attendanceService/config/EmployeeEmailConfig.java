@@ -26,6 +26,10 @@ public class EmployeeEmailConfig {
         employeeEmails.put("64", "mayur.jadhav@configserverllp.com");
         employeeEmails.put("65", "akash.pawale@configserverllp.com");
         employeeEmails.put("0081", "pranit.borkar@configserverllp.com");
+        employeeEmails.put("0082", "shruti.thorat@configserverllp.com");
+        employeeEmails.put("0083", "payal.damare@configserverllp.com");
+        employeeEmails.put("0084", "adhishri.deshmukh@configserverllp.com");
+        employeeEmails.put("0086", "prachi.ghatole@configserverllp.com");
 
         // Add more employees here
     }
