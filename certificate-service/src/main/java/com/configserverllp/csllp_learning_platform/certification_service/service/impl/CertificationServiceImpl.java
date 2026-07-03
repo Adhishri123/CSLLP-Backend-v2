@@ -14,12 +14,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -344,39 +342,59 @@ public class CertificationServiceImpl implements CertificationService {
             Map<String, Object> employeeInfo = fetchEmployeeInfo(certification.getEmployeeId());
             Map<String, Object> courseInfo = fetchCourseInfo(certification.getCourseId());
 
-            // 🔍 Enhanced debug logs
-            System.out.println("=== CERTIFICATE DATA DEBUG ===");
-            System.out.println("👤 Raw Employee Info: " + employeeInfo);
-            System.out.println("📘 Raw Course Info: " + courseInfo);
+            // 🔍 DEBUG: Print ALL keys and values from employeeInfo
+            System.out.println("=== ALL EMPLOYEE DATA ===");
+            for (Map.Entry<String, Object> entry : employeeInfo.entrySet()) {
+                System.out.println(entry.getKey() + " = " + entry.getValue());
+            }
 
-//            // ✅ Enhanced employee name extraction with multiple fallbacks
-//            String employeeName = extractEmployeeName(employeeInfo);
-//            String courseName = extractCourseName(courseInfo);
-            // Extract first and last name separately from employeeInfo
-//            String firstName = (String) employeeInfo.get("firstName");
-//            String lastName = (String) employeeInfo.get("lastName");
-            String firstName = employeeInfo.get("firstName") != null
-                    ? employeeInfo.get("firstName").toString()
-                    : "Unknown";
+            // Try all possible name fields
+            String firstName = null;
+            String lastName = null;
 
-            String lastName = employeeInfo.get("lastName") != null
-                    ? employeeInfo.get("lastName").toString()
-                    : "";
+            // Try different field name combinations
+            if (employeeInfo.containsKey("firstName")) {
+                firstName = employeeInfo.get("firstName").toString();
+            } else if (employeeInfo.containsKey("firstname")) {
+                firstName = employeeInfo.get("firstname").toString();
+            } else if (employeeInfo.containsKey("fullName")) {
+                // If only one name field exists, use it as full name
+                String fullName = employeeInfo.get("fullName").toString();
+                // Split into first and last if possible
+                String[] nameParts = fullName.split(" ", 2);
+                firstName = nameParts[0];
+                lastName = nameParts.length > 1 ? nameParts[1] : "";
+            }
+
+            if (employeeInfo.containsKey("lastName")) {
+                lastName = employeeInfo.get("lastName").toString();
+            } else if (employeeInfo.containsKey("lastname")) {
+                lastName = employeeInfo.get("lastname").toString();
+            }
+
+            // If still null, use employee ID or email as fallback
+            if (firstName == null || firstName.isEmpty() || firstName.equals("null")) {
+                firstName = employeeInfo.getOrDefault("email", "Employee").toString();
+                System.out.println("⚠️ Using email as firstName: " + firstName);
+            }
+
+            if (lastName == null || lastName.isEmpty() || lastName.equals("null")) {
+                lastName = "";
+            }
+
             String courseName = extractCourseName(courseInfo);
 
-
-            //System.out.println("✅ Extracted Employee Name: " + employeeName);
+            System.out.println("✅ Extracted - First Name: " + firstName + ", Last Name: " + lastName);
             System.out.println("✅ Extracted Course Name: " + courseName);
             System.out.println("🎫 Verification Code: " + certification.getVerificationCode());
             System.out.println("📅 Issue Date: " + certification.getIssueDate());
 
             System.out.println("✅ Extracted - First Name: " + firstName + ", Last Name: " + lastName);
 
-
-            // Prepare data for PDF with separate first/last names
+            // Prepare data for PDF
             Map<String, Object> pdfData = pdfGenerator.prepareCertificateData(
                     firstName,
-                    lastName,  // Pass lastName separately
+                    lastName,
                     courseName,
                     certification.getIssueDate().toString(),
                     certification.getVerificationCode()
@@ -521,7 +539,7 @@ public class CertificationServiceImpl implements CertificationService {
     @SuppressWarnings("unchecked")
     private Map<String, Object> fetchCourseInfo(Long courseId) {
         try {
-            String url = courseServiceUrl + "/api/courses/" + courseId;
+            String url = courseServiceUrl + "/courses/" + courseId;
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             if (response != null && response.get("data") instanceof Map) {
                 return (Map<String, Object>) response.get("data");
@@ -543,7 +561,7 @@ public class CertificationServiceImpl implements CertificationService {
 
     private Integer getCourseProgress(Long employeeId, Long courseId) {
         try {
-            String url = courseServiceUrl + "/api/courses/enrollments/" + employeeId;
+            String url = courseServiceUrl + "/courses/enrollments/" + employeeId;
             System.out.println("🔗 Calling course service: " + url);
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
