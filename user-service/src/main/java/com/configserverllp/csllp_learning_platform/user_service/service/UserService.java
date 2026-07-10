@@ -5,6 +5,7 @@ import com.configserverllp.csllp_learning_platform.user_service.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -46,8 +47,7 @@ public interface UserService {
 
     User createManualUser(@Valid UserRequest dto);
 
+    UserResponse uploadProfilePhoto(Long userId, MultipartFile file) throws IOException;
 
-//    User getCurrentUserProfile(String email);
-//
-//    String updateProfileImage(Long id, MultipartFile profileImage);
+
 }
