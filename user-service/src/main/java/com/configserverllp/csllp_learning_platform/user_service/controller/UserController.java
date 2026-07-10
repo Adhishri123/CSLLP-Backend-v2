@@ -10,16 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -216,24 +210,22 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-//    @PostMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<String> uploadProfileImage(@RequestParam("image") MultipartFile image) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//        User currentUser = userService.getCurrentUserProfile(email);
-//
-//        String imagePath = userService.updateProfileImage(currentUser.getId(), image);
-//        return ResponseEntity.ok("Profile image uploaded successfully: " + imagePath);
-//    }
+    // =====================================
+    // Profile Photo Upload Endpoint
+    // =====================================
+    @PostMapping(value = "/{id}/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<UserResponse>> uploadProfilePhoto(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            UserResponse updatedUser = userService.uploadProfilePhoto(id, file);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Profile photo uploaded successfully", updatedUser));
+        } catch (IOException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Failed to upload profile photo: " + e.getMessage(), null));
+        }
+    }
 
 
-//    // ADD SEARCH ENDPOINT:
-//    @GetMapping("/search")
-//    public ResponseEntity<ApiResponse<List<UserSearchResponse>>> searchUsers(
-//            @RequestParam String query,
-//            @RequestParam(required = false) String role) {
-//        // Search by name, email, or employee ID
-//        // Return: ID, name, email, department, employeeId
-//    }
 
 }

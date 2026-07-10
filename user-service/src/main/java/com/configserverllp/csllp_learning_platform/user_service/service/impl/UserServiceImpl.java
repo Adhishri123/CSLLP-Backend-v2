@@ -10,30 +10,24 @@ import com.configserverllp.csllp_learning_platform.user_service.exception.Resour
 import com.configserverllp.csllp_learning_platform.user_service.repository.OtpRepository;
 import com.configserverllp.csllp_learning_platform.user_service.repository.UserRepository;
 import com.configserverllp.csllp_learning_platform.user_service.service.UserService;
-import jakarta.validation.Valid;
-import jdk.jshell.spi.ExecutionControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -47,7 +41,6 @@ public class UserServiceImpl implements UserService {
     // Add this field in UserServiceImpl class
     private final OtpRepository otpRepository;
     private Object emailService;
-
     //private Object Dto;
 
 
@@ -592,6 +585,99 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createManualUser(UserRequest dto) {
         return null;
+    }
+
+    @Override
+    @Transactional
+    public UserResponse uploadProfilePhoto(Long userId, MultipartFile file) throws IOException {
+        // Validate user exists
+        User user = getUserById(userId);
+
+        // Validate file
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("File is empty. Please select a valid image file.");
+        }
+
+        // Validate file type (only images)
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new BadRequestException("Only image files are allowed (JPEG, PNG, GIF, etc.)");
+        }
+
+        // Validate file size (max 5MB)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new BadRequestException("File size exceeds 5MB limit. Please choose a smaller image.");
+        }
+
+        // Delete old profile photo if exists
+        if (user.getProfilePhotoUrl() != null) {
+            try {
+                String oldFileName = user.getProfilePhotoUrl().replace("/uploads/profiles/", "");
+                Path oldPath = Paths.get(uploadDir, oldFileName);
+                Files.deleteIfExists(oldPath);
+            } catch (Exception e) {
+                System.err.println("Could not delete old profile photo: " + e.getMessage());
+            }
+        }
+
+        // Create upload directory if it doesn't exist
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        // Generate unique filename
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        } else {
+            fileExtension = ".jpg";
+        }
+
+        String fileName = userId + "_" + System.currentTimeMillis() + fileExtension;
+        Path filePath = uploadPath.resolve(fileName);
+
+        // Save file
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Update user with photo URL
+        String photoUrl = "/uploads/profiles/" + fileName;
+        user.setProfilePhotoUrl(photoUrl);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        return mapToUserResponse(user);
+    }
+
+    // =====================================
+    // Helper method to map User to UserResponse
+    // =====================================
+    private UserResponse mapToUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .role(user.getRole())
+                .managerId(user.getManagerId())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .profilePhotoUrl(user.getProfilePhotoUrl())
+                .designation(user.getDesignation())
+                .department(user.getDepartment())
+                .annualSalary(user.getAnnualSalary())
+                .dateOfJoining(user.getDateOfJoining())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .panNumber(user.getPanNumber())
+                .pfNumber(user.getPfNumber())
+                .uanNumber(user.getUanNumber())
+                .bankName(user.getBankName())
+                .bankBranch(user.getBankBranch())
+                .bankAccountNumber(user.getBankAccountNumber())
+                .vendorCode(user.getVendorCode())
+                .build();
     }
 
 //    @Override
