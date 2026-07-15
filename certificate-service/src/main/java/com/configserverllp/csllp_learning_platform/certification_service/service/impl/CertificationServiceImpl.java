@@ -164,7 +164,8 @@ public class CertificationServiceImpl implements CertificationService {
                         }
 
                         // ✅ TEMPORARY: Lowered passing score for testing
-                        if (score < 50.0) {
+//                        if (score < 50.0) {
+                        if (score < 1.0) {
                             System.out.println("❌ Exam not passed, score: " + score);
                             return false;
                         }
